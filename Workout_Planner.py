@@ -1,4 +1,4 @@
-class Exersice:
+class Exercise:
     def __init__(self, name):
         self.name = name
     
@@ -9,7 +9,7 @@ class Exersice:
 
 
 
-class StrengthExercise(Exersice):
+class StrengthExercise(Exercise):
     def __init__(self, name, muscle):
         super().__init__(name)
         self.muscle = muscle
@@ -20,7 +20,7 @@ class StrengthExercise(Exersice):
 
 
 
-class CardioExercise(Exersice):
+class CardioExercise(Exercise):
     def __init__(self, name, duration):
         super().__init__(name)
         self.duration = duration
@@ -58,6 +58,8 @@ class Set:
         return f"{self.exercise.name}: {self.reps} reps x {self.weight} kg"
 
 
+
+
 class WorkoutSession:
     def __init__(self, date):
         self.date = date
@@ -73,13 +75,41 @@ class WorkoutSession:
 
 
 
-ex1 = StrengthExercise("Bench Press", "Chest")
-ex2 = CardioExercise("Running", 30)
 
-workout = WorkoutSession("2026-04-16")
+class ProgressTracker:
+    def __init__(self):
+        self.workout_sessions = []
 
-session = WorkoutPlan("Kruitne ir Kardio")
-session.add_exercise(ex1)
-session.add_exercise(ex2)
+    def add_workout_session(self, session):
+        self.workout_sessions.append(session)
+    
+    def track_weight(self, exercise_name):
+        max_weight = 0
 
-session.show()
+        for session in self.workout_sessions:
+            for s in session.sets:
+                if s.exercise.name == exercise_name:
+                    if s.weight > max_weight:
+                        max_weight = s.weight
+        
+        return max_weight
+    
+    def between_session_weight_result(self, exercise_name):
+        if len(self.workout_sessions) >= 2:
+
+            max_weight_1 = 0
+            for s in self.workout_sessions[len(self.workout_sessions)-2].sets:
+                    if s.exercise.name == exercise_name:
+                        if s.weight > max_weight_1:
+                            max_weight_1 = s.weight
+
+            max_weight_2 = 0
+            for s in self.workout_sessions[len(self.workout_sessions)-1].sets:
+                    if s.exercise.name == exercise_name:
+                        if s.weight > max_weight_2:
+                            max_weight_2 = s.weight
+        
+            return max_weight_2 - max_weight_1
+    
+        else: 
+            return None
