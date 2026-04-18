@@ -12,7 +12,6 @@ class ProgressTracker:
 
 
 
-
 class ProgressStrategy:
     def calculate(self, sessions, exercise_name):
         raise NotImplementedError("Each strategy must implement calculate method")
@@ -20,44 +19,59 @@ class ProgressStrategy:
 
 
 
+class BetweenSessionsStrategy(ProgressStrategy):
+    def __init__(self, metric):
+        self.metric = metric
 
-class BetweenSessionsStrengthProgressStrategy(ProgressStrategy):
     def calculate(self, sessions, exercise_name):
         if len(sessions) < 2:
             return None
         
-        def get_max_weight(session):
-            max_weight = 0
+        def get_max_value(session):
+            max_value = 0
+            flag = False
             for s in session.sets:
                 if s.exercise.name == exercise_name:
-                    if s.weight > max_weight:
-                        max_weight = s.weight
-            return max_weight
+                    flag = True
+                    value = getattr(s, self.metric, None)
+                    if value is not None and value > max_value:
+                        max_value = value
+
+            return max_value, flag
         
-        session_1 = get_max_weight(sessions[-2])
-        session_2 = get_max_weight(sessions[-1])
+        previous_max, found = get_max_value(sessions[-2])
+        if not found:
+            raise ValueError("Exercise not found")
+        
+        last_max, found = get_max_value(sessions[-1])
+        if not found:
+            raise ValueError("Exercise not found")
 
-        return session_2 - session_1
+        return last_max - previous_max
 
 
 
 
-class OverallStrenghtProgressStrategy(ProgressStrategy):
+class OverallStrategy(ProgressStrategy):
+    def __init__(self, metric):
+        self.metric = metric
+
     def calculate(self, sessions, exercise_name):
         if len(sessions) < 2:
             return None
         
-        def get_max_weight(session):
-            max_weight = 0
+        def get_max_value(session):
+            max_value = 0
             found = False
 
             for s in session.sets:
                 if s.exercise.name == exercise_name:
                     found = True
-                    if s.weight > max_weight:
-                        max_weight = s.weight
+                    value = getattr(s, self.metric, None)
+                    if value is not None and value > max_value:
+                        max_value = value
 
-            return max_weight, found
+            return max_value, found
         
 
         #didziausias max per visas treniruotes, isskirus paskutine
@@ -65,7 +79,7 @@ class OverallStrenghtProgressStrategy(ProgressStrategy):
         found_any = False
 
         for session in sessions[:-1]:
-            session_max, found = get_max_weight(session)
+            session_max, found = get_max_value(session)
 
             if found:
                 found_any = True
@@ -73,77 +87,9 @@ class OverallStrenghtProgressStrategy(ProgressStrategy):
                     max_overall = session_max
         
         #paskutines treniruotes max
-        last_max, found_last = get_max_weight(sessions[-1])
+        last_max, found_last = get_max_value(sessions[-1])
 
-        if not found_any:
-            return None
-        
-        if not found_last:
-            return None
-        
-        return last_max - max_overall
-
-
-
-
-class BetweenSessionsCardioProgressStrategy(ProgressStrategy):
-    def calculate(self, sessions, exercise_name):
-        if len(sessions) < 2:
-            return None
-        
-        def get_max_duration(session):
-            max_duration = 0
-            for s in session.sets:
-                if s.exercise.name == exercise_name:
-                    if s.duration > max_duration:
-                        max_duration = s.duration
-            return max_duration
-        
-        session_1 = get_max_duration(sessions[-2])
-        session_2 = get_max_duration(sessions[-1])
-
-        return session_2 - session_1
-
-
-
-
-class OverallCardioProgressStrategy(ProgressStrategy):
-    def calculate(self, sessions, exercise_name):
-        if len(sessions) < 2:
-            return None
-        
-        def get_max_duration(session):
-            max_duration = 0
-            found = False
-
-            for s in session.sets:
-                if s.exercise.name == exercise_name:
-                    found = True
-                    if s.duration > max_duration:
-                        max_duration = s.duration
-
-            return max_duration, found
-        
-
-        #didziausias max per visas treniruotes, isskirus paskutine
-        max_overall = 0
-        found_any = False
-
-        for session in sessions[:-1]:
-            session_max, found = get_max_duration(session)
-
-            if found:
-                found_any = True
-                if session_max > max_overall:
-                    max_overall = session_max
-        
-        #paskutines treniruotes max
-        last_max, found_last = get_max_duration(sessions[-1])
-
-        if not found_any:
-            return None
-        
-        if not found_last:
-            return None
+        if not found_any and not found_last:
+            raise ValueError("Exercise not found")
         
         return last_max - max_overall
