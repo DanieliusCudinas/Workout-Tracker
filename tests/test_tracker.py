@@ -109,7 +109,7 @@ class TestCardioProgress(unittest.TestCase):
 
         self.assertEqual(result, 10)
 """
-
+"""
 #Strategy Pattern Test
 
 from tracker import (
@@ -157,3 +157,45 @@ class TestStrategyPattern(unittest.TestCase):
         # paskutinė = 100 → 100 - 120 = -20
         self.assertEqual(result_overall, -20)
 
+"""
+
+from factory import TrackerFactory
+from tracker import (
+    ProgressTracker,
+    BetweenSessionsStrengthProgressStrategy,
+    OverallStrenghtProgressStrategy,
+    BetweenSessionsCardioProgressStrategy,
+    OverallCardioProgressStrategy
+)
+
+
+class TestFactory(unittest.TestCase):
+
+    def test_create_strength_between_tracker(self):
+        tracker = TrackerFactory.create_tracker("strength", "between")
+
+        self.assertIsInstance(tracker, ProgressTracker)
+        self.assertIsInstance(tracker.strategy, BetweenSessionsStrengthProgressStrategy)
+
+    def test_create_strength_overall_tracker(self):
+        tracker = TrackerFactory.create_tracker("strength", "overall")
+
+        self.assertIsInstance(tracker.strategy, OverallStrenghtProgressStrategy)
+
+    def test_create_cardio_between_tracker(self):
+        tracker = TrackerFactory.create_tracker("cardio", "between")
+
+        self.assertIsInstance(tracker.strategy, BetweenSessionsCardioProgressStrategy)
+
+    def test_create_cardio_overall_tracker(self):
+        tracker = TrackerFactory.create_tracker("cardio", "overall")
+
+        self.assertIsInstance(tracker.strategy, OverallCardioProgressStrategy)
+
+    def test_invalid_exercise_type(self):
+        with self.assertRaises(ValueError):
+            TrackerFactory.create_tracker("invalid", "between")
+
+    def test_invalid_mode(self):
+        with self.assertRaises(ValueError):
+            TrackerFactory.create_tracker("strength", "invalid")
