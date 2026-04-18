@@ -29,6 +29,29 @@ class StrengthSet(Set):
         self.reps = reps
         self.weight = weight
 
+    @property
+    def reps(self):
+        return self._reps
+    
+    @reps.setter
+    def reps(self, value):
+        if not value or value < 0:
+            raise ValueError("Reps cannot be empty / cannot be less than 0")
+        self._reps = value
+
+    @property
+    def weight(self):
+        return self._weight
+    
+    @weight.setter
+    def weight(self, value):
+        if not value or value < 0:
+            raise ValueError("Weight cannot be empty / cannot be less than 0")
+        self._weight = value
+
+    def get_info(self):
+        return f"{self.exercise.name}: {self.reps} reps x {self.weight} kg"
+
 
 
 
@@ -36,6 +59,19 @@ class CardioSet(Set):
     def __init__(self, exercise, duration):
         super().__init__(exercise)
         self.duration = duration
+
+    @property
+    def duration(self):
+        return self._duration
+    
+    @duration.setter
+    def duration(self, value):
+        if not value or value < 0:
+            raise ValueError("Duration cannot be empty / cannot be less than 0")
+        self._duration = value
+    
+    def get_info(self):
+        return f"{self.exercise.name}: {self.duration} min"
     
 
 

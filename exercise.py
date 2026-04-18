@@ -21,9 +21,8 @@ class StrengthExercise(Exercise):
 
 
 class CardioExercise(Exercise):
-    def __init__(self, name, duration):
+    def __init__(self, name):
         super().__init__(name)
-        self.duration = duration
     
     def get_info(self):
         return f"{self.name} - {self.duration}"

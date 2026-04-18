@@ -21,7 +21,7 @@ class ProgressStrategy:
 
 
 
-class StrengthProgressStrategy(ProgressStrategy):
+class BetweenSessionsStrengthProgressStrategy(ProgressStrategy):
     def calculate(self, sessions, exercise_name):
         if len(sessions) < 2:
             return None
@@ -42,8 +42,51 @@ class StrengthProgressStrategy(ProgressStrategy):
 
 
 
+class OverallStrenghtProgressStrategy(ProgressStrategy):
+    def calculate(self, sessions, exercise_name):
+        if len(sessions) < 2:
+            return None
+        
+        def get_max_weight(session):
+            max_weight = 0
+            found = False
 
-class CardioProgressStrategy(ProgressStrategy):
+            for s in session.sets:
+                if s.exercise.name == exercise_name:
+                    found = True
+                    if s.weight > max_weight:
+                        max_weight = s.weight
+
+            return max_weight, found
+        
+
+        #didziausias max per visas treniruotes, isskirus paskutine
+        max_overall = 0
+        found_any = False
+
+        for session in sessions[:-1]:
+            session_max, found = get_max_weight(session)
+
+            if found:
+                found_any = True
+                if session_max > max_overall:
+                    max_overall = session_max
+        
+        #paskutines treniruotes max
+        last_max, found_last = get_max_weight(sessions[-1])
+
+        if not found_any:
+            return None
+        
+        if not found_last:
+            return None
+        
+        return last_max - max_overall
+
+
+
+
+class BetweenSessionsCardioProgressStrategy(ProgressStrategy):
     def calculate(self, sessions, exercise_name):
         if len(sessions) < 2:
             return None
@@ -60,3 +103,47 @@ class CardioProgressStrategy(ProgressStrategy):
         session_2 = get_max_duration(sessions[-1])
 
         return session_2 - session_1
+
+
+
+
+class OverallCardioProgressStrategy(ProgressStrategy):
+    def calculate(self, sessions, exercise_name):
+        if len(sessions) < 2:
+            return None
+        
+        def get_max_duration(session):
+            max_duration = 0
+            found = False
+
+            for s in session.sets:
+                if s.exercise.name == exercise_name:
+                    found = True
+                    if s.duration > max_duration:
+                        max_duration = s.duration
+
+            return max_duration, found
+        
+
+        #didziausias max per visas treniruotes, isskirus paskutine
+        max_overall = 0
+        found_any = False
+
+        for session in sessions[:-1]:
+            session_max, found = get_max_duration(session)
+
+            if found:
+                found_any = True
+                if session_max > max_overall:
+                    max_overall = session_max
+        
+        #paskutines treniruotes max
+        last_max, found_last = get_max_duration(sessions[-1])
+
+        if not found_any:
+            return None
+        
+        if not found_last:
+            return None
+        
+        return last_max - max_overall

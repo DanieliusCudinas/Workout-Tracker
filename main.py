@@ -1,6 +1,6 @@
 from exercise import StrengthExercise, CardioExercise
 from workout import WorkoutSession, StrengthSet, CardioSet
-from tracker import ProgressTracker, StrengthProgressStrategy, CardioProgressStrategy
+from tracker import ProgressTracker, BetweenSessionsStrengthProgressStrategy, OverallStrenghtProgressStrategy, BetweenSessionsCardioProgressStrategy, OverallCardioProgressStrategy
 
 
 if __name__ == "__main__":
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # Pratimai
     bench = StrengthExercise("Bench Press", "Chest")
     squat = StrengthExercise("Squat", "Legs")
-    running = CardioExercise("Running", 30)
+    running = CardioExercise("Running")
 
 
     # Pirma treniruote
@@ -27,23 +27,21 @@ if __name__ == "__main__":
 
 
     # STRENGTH TRACKER
-    strength_tracker = ProgressTracker(StrengthProgressStrategy())
+    strength_tracker = ProgressTracker(BetweenSessionsStrengthProgressStrategy())
     strength_tracker.add_workout_session(session1)
     strength_tracker.add_workout_session(session2)
 
     print("=== STRENGTH PROGRESS ===")
-    print("Bench Press progress:",
-          strength_tracker.calculate_progress("Bench Press"))
+    print("Bench Press progress:", strength_tracker.calculate_progress("Bench Press"))
 
-    print("Squat progress:",
-          strength_tracker.calculate_progress("Squat"))
+    print("Squat progress:",strength_tracker.calculate_progress("Squat"))
+
 
 
     # CARDIO TRACKER
-    cardio_tracker = ProgressTracker(CardioProgressStrategy())
+    cardio_tracker = ProgressTracker(BetweenSessionsCardioProgressStrategy())
     cardio_tracker.add_workout_session(session1)
     cardio_tracker.add_workout_session(session2)
 
     print("\n=== CARDIO PROGRESS ===")
-    print("Running progress:",
-          cardio_tracker.calculate_progress("Running"))
+    print("Running progress:", cardio_tracker.calculate_progress("Running"))

@@ -1,5 +1,5 @@
 import unittest
-
+"""
 from exercise import StrengthExercise
 from workout import Set, WorkoutSession
 from tracker import ProgressTracker
@@ -108,3 +108,52 @@ class TestCardioProgress(unittest.TestCase):
         result = tracker.calculate_progress("Running")
 
         self.assertEqual(result, 10)
+"""
+
+#Strategy Pattern Test
+
+from tracker import (
+    ProgressTracker,
+    BetweenSessionsStrengthProgressStrategy,
+    OverallStrenghtProgressStrategy
+)
+
+from workout import WorkoutSession, StrengthSet
+from exercise import StrengthExercise
+
+
+class TestStrategyPattern(unittest.TestCase):
+
+    def test_strategy_switching(self):
+        bench = StrengthExercise("Bench Press", "Chest")
+
+        # 3 treniruotės
+        session1 = WorkoutSession("2026-04-10")
+        session1.add_set(StrengthSet(bench, 8, 80))
+
+        session2 = WorkoutSession("2026-04-12")
+        session2.add_set(StrengthSet(bench, 6, 120))  # max čia
+
+        session3 = WorkoutSession("2026-04-14")
+        session3.add_set(StrengthSet(bench, 5, 100))  # mažiau nei max
+
+        # 🔹 BetweenSessions
+        tracker = ProgressTracker(BetweenSessionsStrengthProgressStrategy())
+        tracker.add_workout_session(session1)
+        tracker.add_workout_session(session2)
+        tracker.add_workout_session(session3)
+
+        result_between = tracker.calculate_progress("Bench Press")
+
+        # paskutinės dvi: 100 - 120 = -20
+        self.assertEqual(result_between, -20)
+
+        # 🔹 pakeičiam strategiją (čia svarbiausia dalis!)
+        tracker.strategy = OverallStrenghtProgressStrategy()
+
+        result_overall = tracker.calculate_progress("Bench Press")
+
+        # overall max (be paskutinės) = 120
+        # paskutinė = 100 → 100 - 120 = -20
+        self.assertEqual(result_overall, -20)
+
