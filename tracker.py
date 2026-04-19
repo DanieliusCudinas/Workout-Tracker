@@ -106,7 +106,7 @@ class BetweenSessionsStrategy(ProgressStrategy):
         previous_max, found_prev = get_max_value(sessions[-2])
         last_max, found_last = get_max_value(sessions[-1])
 
-        if not found_prev and not found_last:
+        if not found_prev or not found_last:
             raise ValueError("Exercise not found")
 
         return last_max - previous_max

@@ -1,47 +1,141 @@
-from exercise import StrengthExercise, CardioExercise
+from tracker import ProgressTracker, BetweenSessionsStrategy, OverallStrategy
 from workout import WorkoutSession, StrengthSet, CardioSet
-from tracker import ProgressTracker, BetweenSessionsStrengthProgressStrategy, OverallStrenghtProgressStrategy, BetweenSessionsCardioProgressStrategy, OverallCardioProgressStrategy
+from exercise import StrengthExercise, CardioExercise
+
+
+def main():
+    tracker = ProgressTracker(BetweenSessionsStrategy("weight"))
+
+    while True:
+        print("\n=== WORKOUT TRACKER ===")
+        print("1. Add workout session")
+        print("2. Show last sessions")
+        print("3. Calculate progress")
+        print("4. Save to file")
+        print("5. Load from file")
+        print("0. Exit")
+
+        choice = input("Choose option: ")
+
+        # EXIT
+        if choice == "0":
+            print("Goodbye!")
+            break
+
+        # ADD SESSION
+        elif choice == "1":
+            date = input("Enter date (YYYY-MM-DD): ")
+            session = WorkoutSession(date)
+
+            while True:
+                print("\nAdd set:")
+                print("1. Strength")
+                print("2. Cardio")
+                print("0. Finish session")
+
+                set_choice = input("Choose: ")
+
+                if set_choice == "0":
+                    break
+
+                elif set_choice == "1":
+                    try:
+                        name = input("Exercise name: ")
+                        muscle = input("Muscle: ")
+                        reps = int(input("Reps: "))
+                        weight = float(input("Weight: "))
+
+                        ex = StrengthExercise(name, muscle)
+                        s = StrengthSet(ex, reps, weight)
+                        session.add_set(s)
+                    except Exception as e:
+                        print("Error:", e)
+
+                elif set_choice == "2":
+                    try:
+                        name = input("Exercise name: ")
+                        duration = float(input("Duration (min): "))
+
+                        ex = CardioExercise(name)
+                        s = CardioSet(ex, duration)
+                        session.add_set(s)
+                    except Exception as e:
+                        print("Error:", e)
+
+                else:
+                    print("Invalid option")
+
+            tracker.add_workout_session(session)
+            print("Session added!")
+
+        # SHOW LAST SESSIONS
+        elif choice == "2":
+            try:
+                n = int(input("How many sessions to show: "))
+                tracker.show_last_sessions(n)
+            except:
+                print("Invalid number")
+
+        # CALCULATE PROGRESS
+        elif choice == "3":
+            name = input("Exercise name: ")
+
+            print("Choose mode:")
+            print("1. Between sessions")
+            print("2. Overall")
+
+            mode = input("Mode: ")
+
+            print("Choose type:")
+            print("1. Strength")
+            print("2. Cardio")
+
+            ex_type = input("Type: ")
+
+            # 🔥 FIX: metric ir strategy parenkami kartu
+            if ex_type == "1":
+                if mode == "1":
+                    tracker.strategy = BetweenSessionsStrategy("weight")
+                elif mode == "2":
+                    tracker.strategy = OverallStrategy("weight")
+                else:
+                    print("Invalid mode")
+                    continue
+
+            elif ex_type == "2":
+                if mode == "1":
+                    tracker.strategy = BetweenSessionsStrategy("duration")
+                elif mode == "2":
+                    tracker.strategy = OverallStrategy("duration")
+                else:
+                    print("Invalid mode")
+                    continue
+
+            else:
+                print("Invalid type")
+                continue
+
+            try:
+                result = tracker.calculate_progress(name)
+                print("Progress:", result)
+            except Exception as e:
+                print("Error:", e)
+
+        # SAVE
+        elif choice == "4":
+            filename = input("Filename: ")
+            tracker.save_to_file(filename)
+            print("Saved!")
+
+        # LOAD
+        elif choice == "5":
+            filename = input("Filename: ")
+            tracker.load_from_file(filename)
+            print("Loaded!")
+
+        else:
+            print("Invalid option")
 
 
 if __name__ == "__main__":
-
-    # Pratimai
-    bench = StrengthExercise("Bench Press", "Chest")
-    squat = StrengthExercise("Squat", "Legs")
-    running = CardioExercise("Running")
-
-
-    # Pirma treniruote
-    session1 = WorkoutSession("2026-04-10")
-    session1.add_set(StrengthSet(bench, 8, 80))
-    session1.add_set(StrengthSet(squat, 5, 100))
-    session1.add_set(CardioSet(running, 30))
-
-
-    # Antra treniruote
-    session2 = WorkoutSession("2026-04-12")
-    session2.add_set(StrengthSet(bench, 6, 90))
-    session2.add_set(StrengthSet(squat, 5, 110))
-    session2.add_set(CardioSet(running, 35))
-
-
-
-    # STRENGTH TRACKER
-    strength_tracker = ProgressTracker(BetweenSessionsStrengthProgressStrategy())
-    strength_tracker.add_workout_session(session1)
-    strength_tracker.add_workout_session(session2)
-
-    print("=== STRENGTH PROGRESS ===")
-    print("Bench Press progress:", strength_tracker.calculate_progress("Bench Press"))
-
-    print("Squat progress:",strength_tracker.calculate_progress("Squat"))
-
-
-
-    # CARDIO TRACKER
-    cardio_tracker = ProgressTracker(BetweenSessionsCardioProgressStrategy())
-    cardio_tracker.add_workout_session(session1)
-    cardio_tracker.add_workout_session(session2)
-
-    print("\n=== CARDIO PROGRESS ===")
-    print("Running progress:", cardio_tracker.calculate_progress("Running"))
+    main()
