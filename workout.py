@@ -35,7 +35,7 @@ class StrengthSet(Set):
     
     @reps.setter
     def reps(self, value):
-        if not value or value < 0:
+        if value is None or value < 0:
             raise ValueError("Reps cannot be empty / cannot be less than 0")
         self._reps = value
 
@@ -45,13 +45,21 @@ class StrengthSet(Set):
     
     @weight.setter
     def weight(self, value):
-        if not value or value < 0:
+        if value is None or value < 0:
             raise ValueError("Weight cannot be empty / cannot be less than 0")
         self._weight = value
 
     def get_info(self):
         return f"{self.exercise.name}: {self.reps} reps x {self.weight} kg"
-
+    
+    def to_dict(self):
+        return {
+            "type": "strength",
+            "name": self.exercise.name,
+            "muscle": self.exercise.muscle,
+            "reps": self.reps,
+            "weight": self.weight
+        }
 
 
 
@@ -66,12 +74,19 @@ class CardioSet(Set):
     
     @duration.setter
     def duration(self, value):
-        if not value or value < 0:
+        if value is None or value < 0:
             raise ValueError("Duration cannot be empty / cannot be less than 0")
         self._duration = value
     
     def get_info(self):
         return f"{self.exercise.name}: {self.duration} min"
+    
+    def to_dict(self):
+        return {
+            "type": "cardio",
+            "name": self.exercise.name,
+            "duration": self.duration
+        }
     
 
 
@@ -88,3 +103,9 @@ class WorkoutSession:
         print(f"\nTreniruotė: {self.date}")
         for s in self.sets:
             print("-", s.get_info())
+    
+    def to_dict(self):
+        return {
+            "date": self.date,
+            "sets": [s.to_dict() for s in self.sets]
+        }
