@@ -1,0 +1,38 @@
+[
+    {
+        "date": "2026-04-20",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 60.0
+            }
+        ]
+    },
+    {
+        "date": "2026-04-29",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 80.0
+            }
+        ]
+    },
+    {
+        "date": "2026-05-05",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 5,
+                "weight": 100.0
+            }
+        ]
+    }
+]

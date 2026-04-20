@@ -1,4 +1,5 @@
 import json
+import os
 
 
 class ProgressTracker:
@@ -13,17 +14,26 @@ class ProgressTracker:
         return self.strategy.calculate(self.workout_sessions, exercise_name)
     
     def save_to_file(self, filename):
+        base_dir = os.path.dirname(__file__)
+
+        filepath = os.path.join(base_dir, filename)
+
         data = [session.to_dict() for session in self.workout_sessions]
 
-        with open(filename, "w") as f:
+        with open(filepath, "w") as f:
             json.dump(data, f, indent=4)
+
+        print(f"Saved to: {filepath}")
     
     def load_from_file(self, filename):
         from workout import WorkoutSession, StrengthSet, CardioSet
         from exercise import StrengthExercise, CardioExercise
 
+        base_dir = os.path.dirname(__file__)
+        filepath = os.path.join(base_dir, filename)
+        
         try:
-            with open(filename, "r") as f:
+            with open(filepath, "r") as f:
                 data = json.load(f)
         except FileNotFoundError:
             print("File not found")
@@ -32,7 +42,7 @@ class ProgressTracker:
             print("Invalid JSON format")
             return
 
-        with open(filename, "r") as f:
+        with open(filepath, "r") as f:
             data = json.load(f)
         
         self.workout_sessions = []
@@ -55,6 +65,8 @@ class ProgressTracker:
                 session.add_set(set_obj)
 
             self.workout_sessions.append(session)
+        
+        print(f"Loaded from: {filepath}")
     
     def get_last_sessions(self, n=5):
         if n <= 0:
@@ -137,7 +149,7 @@ class OverallStrategy(ProgressStrategy):
         
 
         #didziausias max per visas treniruotes, isskirus paskutine
-        max_overall = 0
+        best_overall = None
         found_any = False
 
         for session in sessions[:-1]:
@@ -145,13 +157,27 @@ class OverallStrategy(ProgressStrategy):
 
             if found:
                 found_any = True
-                if session_max > max_overall:
-                    max_overall = session_max
+                if best_overall is None or session_max > best_overall:
+                    best_overall = session_max
         
         #paskutines treniruotes max
         last_max, found_last = get_max_value(sessions[-1])
 
-        if not found_any and not found_last:
+        if not found_any or not found_last:
             raise ValueError("Exercise not found")
         
-        return last_max - max_overall
+        progress = last_max - best_overall
+
+        if progress > 0:
+            status = "Improved"
+        elif progress < 0:
+            status = "Decreased"
+        else:
+            status = "Same"
+
+        return {
+            "best": best_overall,
+            "last": last_max,
+            "progress": progress,
+            "status": status
+        }

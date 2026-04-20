@@ -92,7 +92,7 @@ def main():
 
             ex_type = input("Type: ")
 
-            # 🔥 FIX: metric ir strategy parenkami kartu
+            #metric ir strategy parenkami kartu
             if ex_type == "1":
                 if mode == "1":
                     tracker.strategy = BetweenSessionsStrategy("weight")
@@ -117,7 +117,17 @@ def main():
 
             try:
                 result = tracker.calculate_progress(name)
-                print("Progress:", result)
+
+                if isinstance(result, dict):
+                    print("\n=== Result ===")
+                    print(f"Best result: {result["best"]}")
+                    print(f"Last result: {result["last"]}")
+                    print(f"Progress: {result["progress"]}")
+                    print(f"Status: {result["status"]}")
+                
+                else:
+                    print("Progress:", result)
+
             except Exception as e:
                 print("Error:", e)
 
