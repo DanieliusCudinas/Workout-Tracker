@@ -1,0 +1,88 @@
+[
+    {
+        "date": "2026-04-23",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 60.0
+            },
+            {
+                "type": "strength",
+                "name": "back row",
+                "muscle": "back",
+                "reps": 10,
+                "weight": 70.0
+            },
+            {
+                "type": "strength",
+                "name": "back row",
+                "muscle": "back",
+                "reps": 10,
+                "weight": 70.0
+            },
+            {
+                "type": "cardio",
+                "name": "running",
+                "duration": 30.0
+            }
+        ]
+    },
+    {
+        "date": "2026-04-27",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 80.0
+            },
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 90.0
+            },
+            {
+                "type": "strength",
+                "name": "leg press",
+                "muscle": "chest",
+                "reps": 8,
+                "weight": 120.0
+            },
+            {
+                "type": "cardio",
+                "name": "running",
+                "duration": 42.0
+            }
+        ]
+    },
+    {
+        "date": "2026-05-06",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "bench press",
+                "muscle": "chest",
+                "reps": 10,
+                "weight": 110.0
+            },
+            {
+                "type": "strength",
+                "name": "leg press",
+                "muscle": "legs",
+                "reps": 10,
+                "weight": 122.5
+            },
+            {
+                "type": "cardio",
+                "name": "running",
+                "duration": 43.0
+            }
+        ]
+    }
+]
