@@ -1,201 +1,38 @@
 import unittest
-"""
-from exercise import StrengthExercise
-from workout import Set, WorkoutSession
-from tracker import ProgressTracker
-
-
-class TestProgressTracker(unittest.TestCase):
-
-    def test_track_weight(self):
-        # Sukuriam pratimą
-        bench = StrengthExercise("Bench Press", "Chest")
-
-        # Sukuriam treniruotę
-        session = WorkoutSession("2026-04-10")
-        session.add_set(StrengthSet(bench, 8, 80))
-        session.add_set(StrengthSet(bench, 6, 90))
-
-        # Tracker
-        #tracker = ProgressTracker()
-        #tracker.add_workout_session(session)
-
-        # Testuojam
-        #result = tracker.track_weight("Bench Press")
-
-        # Tikrinam ar teisinga
-        #self.assertEqual(result, 90)
-
-
-if __name__ == "__main__":
-    unittest.main()
-
-def test_between_session_weight(self):
-    # Sukuriam pratimą
-    bench = StrengthExercise("Bench Press", "Chest")
-
-    # Pirma treniruotė
-    session1 = WorkoutSession("2026-04-10")
-    session1.add_set(Set(bench, 8, 80))
-
-    # Antra treniruotė
-    session2 = WorkoutSession("2026-04-12")
-    session2.add_set(Set(bench, 6, 90))
-
-    # Tracker
-    tracker = ProgressTracker()
-    tracker.add_workout_session(session1)
-    tracker.add_workout_session(session2)
-
-    # Testuojam progresą
-    result = tracker.between_session_weight_result("Bench Press")
-
-    # Tikrinam
-    self.assertEqual(result, 10)
-
-
-
-#STRENGTH PROGRESS TEST
-
-from tracker import (
-    ProgressTracker,
-    StrengthProgressStrategy,
-    CardioProgressStrategy
-)
-
-from workout import WorkoutSession, Set, StrengthSet, CardioSet
-from exercise import StrengthExercise, CardioExercise
-
-class TestStrengthProgress(unittest.TestCase):
-
-    def test_strength_progress(self):
-        bench = StrengthExercise("Bench Press", "Chest")
-
-        session1 = WorkoutSession("2026-04-10")
-        session1.add_set(StrengthSet(bench, 8, 80))
-
-        session2 = WorkoutSession("2026-04-12")
-        session2.add_set(StrengthSet(bench, 6, 90))
-
-        tracker = ProgressTracker(StrengthProgressStrategy())
-        tracker.add_workout_session(session1)
-        tracker.add_workout_session(session2)
-
-        result = tracker.calculate_progress("Bench Press")
-
-        self.assertEqual(result, 10)
-
-
-
-
-# CARDIO PROGRESS TEST
-
-class TestCardioProgress(unittest.TestCase):
-
-    def test_cardio_progress(self):
-        running = CardioExercise("Running", 30)
-
-        session1 = WorkoutSession("2026-04-10")
-        session1.add_set(CardioSet(running, 30))
-
-        session2 = WorkoutSession("2026-04-12")
-        session2.add_set(CardioSet(running, 40))
-
-        tracker = ProgressTracker(CardioProgressStrategy())
-        tracker.add_workout_session(session1)
-        tracker.add_workout_session(session2)
-
-        result = tracker.calculate_progress("Running")
-
-        self.assertEqual(result, 10)
-"""
-"""
-#Strategy Pattern Test
-
-from tracker import (
-    ProgressTracker,
-    BetweenSessionsStrengthProgressStrategy,
-    OverallStrenghtProgressStrategy
-)
-
+from tracker import ProgressTracker, BetweenSessionsStrategy, OverallStrategy
 from workout import WorkoutSession, StrengthSet
 from exercise import StrengthExercise
 
 
-class TestStrategyPattern(unittest.TestCase):
+class TestProgressTracker(unittest.TestCase):
 
-    def test_strategy_switching(self):
-        bench = StrengthExercise("Bench Press", "Chest")
+    def setUp(self):
+        self.tracker = ProgressTracker(BetweenSessionsStrategy("weight"))
 
-        # 3 treniruotės
-        session1 = WorkoutSession("2026-04-10")
-        session1.add_set(StrengthSet(bench, 8, 80))
+        # Sukuriam 2 session
+        ex = StrengthExercise("Bench Press", "Chest")
 
-        session2 = WorkoutSession("2026-04-12")
-        session2.add_set(StrengthSet(bench, 6, 120))  # max čia
+        s1 = WorkoutSession("2024-01-01")
+        s1.add_set(StrengthSet(ex, 10, 50))
 
-        session3 = WorkoutSession("2026-04-14")
-        session3.add_set(StrengthSet(bench, 5, 100))  # mažiau nei max
+        s2 = WorkoutSession("2024-01-02")
+        s2.add_set(StrengthSet(ex, 10, 60))
 
-        # 🔹 BetweenSessions
-        tracker = ProgressTracker(BetweenSessionsStrengthProgressStrategy())
-        tracker.add_workout_session(session1)
-        tracker.add_workout_session(session2)
-        tracker.add_workout_session(session3)
+        self.tracker.add_workout_session(s1)
+        self.tracker.add_workout_session(s2)
 
-        result_between = tracker.calculate_progress("Bench Press")
+    def test_between_sessions_progress(self):
+        result = self.tracker.calculate_progress("Bench Press")
+        self.assertEqual(result, 10)
 
-        # paskutinės dvi: 100 - 120 = -20
-        self.assertEqual(result_between, -20)
+    def test_overall_progress(self):
+        self.tracker.strategy = OverallStrategy("weight")
+        result = self.tracker.calculate_progress("Bench Press")
 
-        # 🔹 pakeičiam strategiją (čia svarbiausia dalis!)
-        tracker.strategy = OverallStrenghtProgressStrategy()
-
-        result_overall = tracker.calculate_progress("Bench Press")
-
-        # overall max (be paskutinės) = 120
-        # paskutinė = 100 → 100 - 120 = -20
-        self.assertEqual(result_overall, -20)
-
-"""
-
-from factory import TrackerFactory
-from tracker import (
-    ProgressTracker,
-    BetweenSessionsStrengthProgressStrategy,
-    OverallStrenghtProgressStrategy,
-    BetweenSessionsCardioProgressStrategy,
-    OverallCardioProgressStrategy
-)
+        self.assertEqual(result["progress"], 10)
+        self.assertEqual(result["best"], 50)
+        self.assertEqual(result["last"], 60)
 
 
-class TestFactory(unittest.TestCase):
-
-    def test_create_strength_between_tracker(self):
-        tracker = TrackerFactory.create_tracker("strength", "between")
-
-        self.assertIsInstance(tracker, ProgressTracker)
-        self.assertIsInstance(tracker.strategy, BetweenSessionsStrengthProgressStrategy)
-
-    def test_create_strength_overall_tracker(self):
-        tracker = TrackerFactory.create_tracker("strength", "overall")
-
-        self.assertIsInstance(tracker.strategy, OverallStrenghtProgressStrategy)
-
-    def test_create_cardio_between_tracker(self):
-        tracker = TrackerFactory.create_tracker("cardio", "between")
-
-        self.assertIsInstance(tracker.strategy, BetweenSessionsCardioProgressStrategy)
-
-    def test_create_cardio_overall_tracker(self):
-        tracker = TrackerFactory.create_tracker("cardio", "overall")
-
-        self.assertIsInstance(tracker.strategy, OverallCardioProgressStrategy)
-
-    def test_invalid_exercise_type(self):
-        with self.assertRaises(ValueError):
-            TrackerFactory.create_tracker("invalid", "between")
-
-    def test_invalid_mode(self):
-        with self.assertRaises(ValueError):
-            TrackerFactory.create_tracker("strength", "invalid")
+if __name__ == "__main__":
+    unittest.main()

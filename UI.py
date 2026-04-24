@@ -360,5 +360,5 @@ tk.Button(root, text="Show last sessions", command=show_sessions_window).pack(pa
 tk.Button(root, text="Calculate progress", command=calculate_progress_window).pack(pady=10)
 tk.Button(root, text="Exit", command=root.quit).pack(pady=10)
 
-
-root.mainloop()
+def run_app():
+    root.mainloop()
