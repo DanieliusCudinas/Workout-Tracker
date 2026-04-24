@@ -1,0 +1,8 @@
+Chest
+Back
+Quadriceps
+Hamstrings
+Shoulders
+Triceps
+Biceps
+Core

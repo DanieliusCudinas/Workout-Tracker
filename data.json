@@ -1,87 +1,59 @@
 [
     {
-        "date": "2026-04-23",
+        "date": "2026-04-24",
         "sets": [
             {
                 "type": "strength",
-                "name": "bench press",
-                "muscle": "chest",
+                "name": "Bench Press",
+                "muscle": "Chest",
                 "reps": 10,
                 "weight": 60.0
             },
             {
                 "type": "strength",
-                "name": "back row",
-                "muscle": "back",
+                "name": "Pull Ups",
+                "muscle": "Back",
                 "reps": 10,
-                "weight": 70.0
-            },
-            {
-                "type": "strength",
-                "name": "back row",
-                "muscle": "back",
-                "reps": 10,
-                "weight": 70.0
+                "weight": 65.0
             },
             {
                 "type": "cardio",
-                "name": "running",
-                "duration": 30.0
+                "name": "Running",
+                "duration": 10.0
+            },
+            {
+                "type": "cardio",
+                "name": "Swimming",
+                "duration": 20.0
             }
         ]
     },
     {
-        "date": "2026-04-27",
+        "date": "2026-04-29",
         "sets": [
             {
                 "type": "strength",
-                "name": "bench press",
-                "muscle": "chest",
+                "name": "Bench Press",
+                "muscle": "Chest",
                 "reps": 10,
-                "weight": 80.0
+                "weight": 75.0
             },
             {
+                "type": "cardio",
+                "name": "Running",
+                "duration": 15.0
+            }
+        ]
+    },
+    {
+        "date": "2026-05-01",
+        "sets": [
+            {
                 "type": "strength",
-                "name": "bench press",
-                "muscle": "chest",
+                "name": "Bench Press",
+                "muscle": "Chest",
                 "reps": 10,
                 "weight": 90.0
-            },
-            {
-                "type": "strength",
-                "name": "leg press",
-                "muscle": "chest",
-                "reps": 8,
-                "weight": 120.0
-            },
-            {
-                "type": "cardio",
-                "name": "running",
-                "duration": 42.0
-            }
-        ]
-    },
-    {
-        "date": "2026-05-06",
-        "sets": [
-            {
-                "type": "strength",
-                "name": "bench press",
-                "muscle": "chest",
-                "reps": 10,
-                "weight": 110.0
-            },
-            {
-                "type": "strength",
-                "name": "leg press",
-                "muscle": "legs",
-                "reps": 10,
-                "weight": 122.5
-            },
-            {
-                "type": "cardio",
-                "name": "running",
-                "duration": 43.0
             }
         ]
     }

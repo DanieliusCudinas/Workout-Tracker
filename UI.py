@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 from tracker import ProgressTracker, BetweenSessionsStrategy
 
 
@@ -17,10 +18,26 @@ root.title("Workout Tracker")
 root.geometry("400x400")
 
 
+
+
+def load_exercises(filename):
+    try:
+        with open(filename, "r") as f:
+            return [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        print("Error loading", filename, e)
+        return []
+
+strength_exercises = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/strength_exercises.txt")
+cardio_exercises = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/cardio_exercises.txt")
+muscles = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/muscles.txt")
+
+
+
 def add_session_window():
     window = tk.Toplevel(root)
     window.title("Add Session")
-    window.geometry("500x600")
+    window.geometry("500x650")
 
     from workout import WorkoutSession, StrengthSet, CardioSet
     from exercise import StrengthExercise, CardioExercise
@@ -35,11 +52,14 @@ def add_session_window():
 
     #Input laukai
     tk.Label(window, text="Exercise name").pack()
-    name_entry = tk.Entry(window)
-    name_entry.pack()
+    exercise_var = tk.StringVar()
+    exercise_dropdown = ttk.Combobox(window, textvariable=exercise_var, state="readonly")
+    exercise_dropdown.pack()
 
     muscle_label = tk.Label(window, text="Muscle")
-    muscle_entry = tk.Entry(window)
+    muscle_var = tk.StringVar()
+    muscle_dropdown = ttk.Combobox(window, textvariable=muscle_var, state="readonly")
+    muscle_dropdown["values"] = muscles
 
     reps_label = tk.Label(window, text="Reps")
     reps_entry = tk.Entry(window)
@@ -54,7 +74,7 @@ def add_session_window():
         if set_type.get() == "strength":
             if not muscle_label.winfo_ismapped():
                 muscle_label.pack()
-                muscle_entry.pack()
+                muscle_dropdown.pack()
                 reps_label.pack()
                 reps_entry.pack()
                 weight_label.pack()
@@ -69,11 +89,21 @@ def add_session_window():
                 duration_entry.pack()
 
             muscle_label.pack_forget()
-            muscle_entry.pack_forget()
+            muscle_dropdown.pack_forget()
             reps_label.pack_forget()
             reps_entry.pack_forget()
             weight_label.pack_forget()
             weight_entry.pack_forget()
+        
+        if set_type.get() == "strength":
+            exercise_dropdown["values"] = strength_exercises
+        else:
+            exercise_dropdown["values"] = cardio_exercises
+        
+        exercise_var.set("")
+
+
+    exercise_var.set("")
 
     tk.Radiobutton(window, text="Strength", variable=set_type, value="strength", command=update_fields).pack()
     tk.Radiobutton(window, text="Cardio", variable=set_type, value="cardio", command=update_fields).pack()
@@ -87,16 +117,16 @@ def add_session_window():
 
     def add_set():
         try:
-            name = name_entry.get()
+            name = exercise_var.get()
 
             if not name:
-                raise ValueError("Exercise name is required")
+                raise ValueError("Select exercise")
 
             if set_type.get() == "strength":
-                muscle = muscle_entry.get()
+                muscle = muscle_var.get()
 
                 if not muscle:
-                    raise ValueError("Muscle is required")
+                    raise ValueError("Select muscle")
 
                 if not reps_entry.get() or not weight_entry.get():
                     raise ValueError("Reps and weight are required")
@@ -119,8 +149,8 @@ def add_session_window():
             temp_sets.append(s)
             sets_listbox.insert(tk.END, s.get_info())
 
-            name_entry.delete(0, tk.END)
-            muscle_entry.delete(0, tk.END)
+            exercise_var.set("")
+            muscle_var.set("")
             reps_entry.delete(0, tk.END)
             weight_entry.delete(0, tk.END)
             duration_entry.delete(0, tk.END)
@@ -147,15 +177,77 @@ def add_session_window():
                 session.add_set(s)
             
             tracker.add_workout_session(session)
-            messagebox.showinfo("Success", "Session saved")
+            #Auto save
+            tracker.save_to_file("data.json")
 
             window.destroy()
 
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
+    def delete_set():
+        try:
+            selected = sets_listbox.curselection()
+
+            if not selected:
+                raise ValueError("Select a set to delete")
+            
+            index = selected[0]
+
+            temp_sets.pop(index)
+
+            sets_listbox.delete(index)
+        
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def edit_set():
+        try:
+            selected = sets_listbox.curselection()
+
+            if not selected:
+                raise ValueError("Select a set to edit")
+            
+            index = selected[0]
+            s = temp_sets[index]
+
+            #Uzpildomai laukai
+            exercise_var.set("")
+            exercise_var.set(s.exercise.name)
+
+            if isinstance(s, StrengthSet):
+                set_type.set("strength")
+                update_fields()
+
+                muscle_var.set("")
+                muscle_var.set(s.exercise.muscle)
+
+                reps_entry.delete(0, tk.END)
+                reps_entry.insert(0, s.reps)
+
+                weight_entry.delete(0, tk.END)
+                weight_entry.insert(0, s.weight)
+
+            else:
+                set_type.set("cardio")
+                update_fields()
+
+                duration_entry.delete(0, tk.END)
+                duration_entry.insert(0, s.duration)
+            
+            #Istrinamas senas setas
+            temp_sets.pop(index)
+            sets_listbox.delete(index)
+        
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    
     tk.Button(window, text="Add set", command=add_set).pack(pady=5)
+    tk.Button(window, text="Delete selected", command=delete_set).pack(pady=5)
+    tk.Button(window, text="Edit selected", command=edit_set).pack(pady=5)
     tk.Button(window, text="Save session", command=save_session).pack(pady=10)
+    tk.Button(window, text="Back", command=window.destroy).pack(pady=10)
 
 
 
@@ -177,6 +269,8 @@ def show_sessions_window():
         text.insert(tk.END, f"\nDate: {session.date}\n")
         for s in session.sets:
             text.insert(tk.END, f" - {s.get_info()}\n")
+    
+    tk.Button(window, text="Back", command=window.destroy).pack(pady=10)
 
 
 
@@ -187,8 +281,9 @@ def calculate_progress_window():
     window.geometry("400x400")
 
     tk.Label(window, text="Exercise name").pack()
-    entry = tk.Entry(window)
-    entry.pack()
+    exercise_var = tk.StringVar()
+    exercise_dropdown = ttk.Combobox(window, textvariable=exercise_var, state="readonly")
+    exercise_dropdown.pack()
 
     result_label = tk.Label(window, text="")
     result_label.pack()
@@ -197,8 +292,16 @@ def calculate_progress_window():
     tk.Label(window, text="Type").pack()
     type_var = tk.StringVar(value="strength")
 
-    tk.Radiobutton(window, text="Strength", variable=type_var, value="strength").pack()
-    tk.Radiobutton(window, text="Cardio", variable=type_var, value="cardio").pack()
+    def update_exercises():
+        if type_var.get() == "strength":
+            exercise_dropdown["values"] = strength_exercises
+        else:
+            exercise_dropdown["values"] = cardio_exercises
+
+        exercise_var.set("")
+
+    tk.Radiobutton(window, text="Strength", variable=type_var, value="strength", command=update_exercises).pack()
+    tk.Radiobutton(window, text="Cardio", variable=type_var, value="cardio", command=update_exercises).pack()
 
     #Mode
     tk.Label(window, text="Mode").pack()
@@ -207,11 +310,13 @@ def calculate_progress_window():
     tk.Radiobutton(window, text="Between sessions", variable=mode_var, value="between").pack()
     tk.Radiobutton(window, text="Overall", variable=mode_var, value="overall").pack()
 
+    update_exercises()
+
     def calculate():
         from tracker import BetweenSessionsStrategy, OverallStrategy
 
         try:
-            name = entry.get()
+            name = exercise_var.get()
 
             if not name:
                 raise ValueError("Enter exercise name")
@@ -236,6 +341,7 @@ def calculate_progress_window():
             messagebox.showerror("Error", str(e))
 
     tk.Button(window, text="Calculate", command=calculate).pack()
+    tk.Button(window, text="Back", command=window.destroy).pack(pady=10)
 
 
 
@@ -252,7 +358,6 @@ def save_data():
 tk.Button(root, text="Add workout session", command=add_session_window).pack(pady=10)
 tk.Button(root, text="Show last sessions", command=show_sessions_window).pack(pady=10)
 tk.Button(root, text="Calculate progress", command=calculate_progress_window).pack(pady=10)
-tk.Button(root, text="Save", command=save_data).pack(pady=10)
 tk.Button(root, text="Exit", command=root.quit).pack(pady=10)
 
 

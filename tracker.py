@@ -115,13 +115,20 @@ class BetweenSessionsStrategy(ProgressStrategy):
 
             return max_value, found       
         
-        previous_max, found_prev = get_max_value(sessions[-2])
-        last_max, found_last = get_max_value(sessions[-1])
 
-        if not found_prev or not found_last:
-            raise ValueError("Exercise not found")
+        found_sessions = []
 
-        return last_max - previous_max
+        for session in reversed(sessions):
+            max_value, found = get_max_value(session)
+            if found:
+                found_sessions.append(max_value)
+            if len(found_sessions) == 2:
+                break
+        
+        if len(found_sessions) < 2:
+            return "Not enough data"
+        
+        return found_sessions[0] - found_sessions[1]
 
 
 
@@ -148,36 +155,32 @@ class OverallStrategy(ProgressStrategy):
             return max_value, found
         
 
-        #didziausias max per visas treniruotes, isskirus paskutine
         best_overall = None
-        found_any = False
+        last_value = None
 
-        for session in sessions[:-1]:
+        for session in reversed(sessions):
             session_max, found = get_max_value(session)
 
             if found:
-                found_any = True
-                if best_overall is None or session_max > best_overall:
-                    best_overall = session_max
-        
-        #paskutines treniruotes max
-        last_max, found_last = get_max_value(sessions[-1])
+                if last_value is None:
+                    last_value = session_max
+                else:
+                    if best_overall is None or session_max > best_overall:
+                        best_overall = session_max
 
-        if not found_any or not found_last:
-            raise ValueError("Exercise not found")
-        
-        progress = last_max - best_overall
+        if last_value is None:
+            return "Exercise never done"
 
-        if progress > 0:
-            status = "Improved"
-        elif progress < 0:
-            status = "Decreased"
-        else:
-            status = "Same"
+        if best_overall is None:
+            return "Only one data point"
+
+        progress = last_value - best_overall
+
+        status = "Improved" if progress > 0 else "Decreased" if progress < 0 else "Same"
 
         return {
             "best": best_overall,
-            "last": last_max,
+            "last": last_value,
             "progress": progress,
             "status": status
         }
