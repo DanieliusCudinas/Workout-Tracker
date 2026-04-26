@@ -68,5 +68,15 @@
                 "weight": 100.0
             }
         ]
+    },
+    {
+        "date": "2026-05-11",
+        "sets": [
+            {
+                "type": "cardio",
+                "name": "Cycling",
+                "duration": 25.0
+            }
+        ]
     }
 ]

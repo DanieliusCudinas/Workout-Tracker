@@ -43,7 +43,7 @@ muscles = load_file("muscles.txt")
 def add_session_window():
     window = tk.Toplevel(root)
     window.title("Add Session")
-    window.geometry("500x650")
+    window.geometry("500x700")
 
     from workout import WorkoutSession, StrengthSet, CardioSet
     from exercise import StrengthExercise, CardioExercise
