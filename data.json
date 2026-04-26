@@ -56,5 +56,17 @@
                 "weight": 90.0
             }
         ]
+    },
+    {
+        "date": "2026-05-06",
+        "sets": [
+            {
+                "type": "strength",
+                "name": "Deadlift",
+                "muscle": "Hamstrings",
+                "reps": 12,
+                "weight": 100.0
+            }
+        ]
     }
 ]

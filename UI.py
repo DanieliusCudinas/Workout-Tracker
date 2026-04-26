@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+import os
 from tracker import ProgressTracker, BetweenSessionsStrategy
 
 
@@ -20,17 +21,22 @@ root.geometry("400x400")
 
 
 
-def load_exercises(filename):
+def load_file(filename):
     try:
-        with open(filename, "r") as f:
+        base_dir = os.path.dirname(__file__)
+        filepath = os.path.join(base_dir, filename)
+
+        with open(filepath, "r") as f:
             return [line.strip() for line in f if line.strip()]
+        
     except Exception as e:
         print("Error loading", filename, e)
         return []
 
-strength_exercises = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/strength_exercises.txt")
-cardio_exercises = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/cardio_exercises.txt")
-muscles = load_exercises("C:/Users/danie/OneDrive/Desktop/kursinis/muscles.txt")
+strength_exercises = load_file("strength_exercises.txt")
+cardio_exercises = load_file("C:/Users/danie/OneDrive/Desktop/kursinis/cardio_exercises.txt")
+muscles = load_file("C:/Users/danie/OneDrive/Desktop/kursinis/muscles.txt")
+
 
 
 
