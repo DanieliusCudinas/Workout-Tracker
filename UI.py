@@ -34,8 +34,8 @@ def load_file(filename):
         return []
 
 strength_exercises = load_file("strength_exercises.txt")
-cardio_exercises = load_file("C:/Users/danie/OneDrive/Desktop/kursinis/cardio_exercises.txt")
-muscles = load_file("C:/Users/danie/OneDrive/Desktop/kursinis/muscles.txt")
+cardio_exercises = load_file("cardio_exercises.txt")
+muscles = load_file("muscles.txt")
 
 
 
